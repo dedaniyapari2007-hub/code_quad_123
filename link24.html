@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuralCare AI | Smart Healthcare</title>
+    <style>
+        :root {
+            --primary: #059669;
+            --secondary: #0d9488;
+            --danger: #e11d48;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: #1e293b;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: -30px auto 40px;
+            padding: 0 15px;
+        }
+
+        .main-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .styled-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-size: 19px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #resultArea {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border-top: 6px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .safety { border-top-color: var(--warning); background: #fffbeb; }
+        .emergency { border-top-color: var(--danger); background: #fff1f2; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌿 RuralCare AI</h1>
+    <p>Smart Health Assistant | સ્માર્ટ આરોગ્ય મદદનીશ</p>
+</header>
+
+<div class="container">
+    <div class="main-card">
+        <input type="text" id="diseaseInput" class="styled-input" list="diseaseList" placeholder="Search 50+ conditions (e.g. Malaria, સાપ ડંખ)...">
+        <datalist id="diseaseList"></datalist>
+
+        <label class="checkbox-container">
+            <input type="checkbox" id="safetyCheck" style="transform: scale(1.4);">
+            <span>I agree to follow safety rules | હું સુરક્ષા નિયમોનું પાલન કરીશ</span>
+        </label>
+
+        <button class="btn-primary" onclick="generateAnalysis()">Analyze Now | તપાસ કરો</button>
+    </div>
+
+    <div id="resultArea">
+        <h2 id="outTitle" style="text-align:center; color: var(--primary);"></h2>
+        <div class="dashboard">
+            <div class="card-box"><h4>📋 Details (વિગત)</h4><p id="outDesc"></p></div>
+            <div class="card-box safety"><h4>🛡️ Safety (સુરક્ષા)</h4><p id="outSafety"></p></div>
+            <div class="card-box"><h4>💊 Care (સારવાર)</h4><p id="outMed"></p></div>
+            <div class="card-box" id="docCard"><h4>👨‍⚕️ Doctor (ડોક્ટર)</h4><p id="outDoc"></p></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const medicalData = {
+        // --- 1-10: COMMON & SEASONAL ---
+        "Fever (તાવ)": { desc: "High body temperature.", safety: "Keep body cool with wet cloth.", med: "Paracetamol", doc: "General Physician" },
+        "Malaria (મેલેરિયા)": { desc: "Mosquito-borne infection with chills.", safety: "Use mosquito nets.", med: "Antimalarial drugs", doc: "Physician" },
+        "Dengue (ડેન્ગ્યુ)": { desc: "Viral fever, joint pain, low platelets.", safety: "Drink papaya leaf juice & fluids.", med: "Fluid therapy", doc: "Physician" },
+        "Typhoid (ટાઈફોઈડ)": { desc: "Bacterial fever from dirty water.", safety: "Drink boiled water only.", med: "Antibiotics", doc: "Physician" },
+        "Common Cold (સર્દી)": { desc: "Viral runny nose and sneezing.", safety: "Steam inhalation daily.", med: "Cetirizine", doc: "General Physician" },
+        "Cough (ઉધરસ)": { desc: "Throat irritation or lung phlegm.", safety: "Gargle with warm salt water.", med: "Cough Syrup", doc: "Physician" },
+        "Pneumonia (ન્યુમોનિયા)": { desc: "Lung infection, breathing difficulty.", safety: "Keep chest warm.", med: "Antibiotics", doc: "Chest Specialist" },
+        "Influenza (ફ્લૂ)": { desc: "Severe body ache and fever.", safety: "Complete rest and isolation.", med: "Antivirals", doc: "Physician" },
+        "Tonsils (કાકડા)": { desc: "Swelling in throat, pain while swallowing.", safety: "Avoid cold drinks.", med: "Antibiotics", doc: "ENT Specialist" },
+        "Sinus (સાઈનસ)": { desc: "Forehead and nose pain.", safety: "Warm compress on face.", med: "Nasal drops", doc: "ENT Specialist" },
+
+        // --- 11-20: EMERGENCIES & INJURIES ---
+        "Snake Bite (સાપ ડંખ)": { desc: "Venomous bite.", safety: "🚨 DO NOT MOVE. Keep limb below heart level.", med: "No home meds.", doc: "🚨 EMERGENCY - GOVT HOSPITAL" },
+        "Dog Bite (કૂતરા ડંખ)": { desc: "Risk of Rabies.", safety: "Wash with soap for 15 mins.", med: "Antiseptic", doc: "🚨 HOSPITAL - NEED INJECTION" },
+        "Scorpion Bite (વીંછી ડંખ)": { desc: "Sharp pain and sweating.", safety: "Keep the area still.", med: "Painkillers", doc: "Hospital" },
+        "Heat Stroke (લૂ લાગવી)": { desc: "Fainting due to sun.", safety: "Move to shade immediately.", med: "ORS / Onion juice", doc: "Physician" },
+        "Fracture (હાડકું ભાંગવું)": { desc: "Broken bone.", safety: "Tie a wooden stick for support.", med: "Ice pack", doc: "Orthopedic Specialist" },
+        "Burn (દાઝી જવું)": { desc: "Skin damage from fire/hot liquid.", safety: "Apply cool running water. No ice.", med: "Burnol / Silver ointment", doc: "Surgeon" },
+        "Electric Shock (વીજળીનો ઝટકો)": { desc: "Injury from electricity.", safety: "Check breathing, keep warm.", med: "First Aid", doc: "🚨 EMERGENCY" },
+        "Deep Cut (ઘા પડવો)": { desc: "Bleeding from sharp object.", safety: "Press firmly to stop blood.", med: "Tetanus Injection", doc: "Surgeon" },
+        "Eye Injury (આંખમાં ઈજા)": { desc: "Object or chemical in eye.", safety: "Do not rub. Wash with clean water.", med: "Eye drops", doc: "Eye Doctor" },
+        "Pesticide Poisoning (દવાની અસર)": { desc: "Inhaling farm chemicals.", safety: "Remove stained clothes, fresh air.", med: "Induce vomiting", doc: "🚨 EMERGENCY" },
+
+        // --- 21-30: DIGESTIVE & STOMACH ---
+        "Diarrhea (ઝાડા)": { desc: "Watery stools.", safety: "Drink ORS after every stool.", med: "Zinc / ORS", doc: "Physician" },
+        "Acidity (એસિડિટી)": { desc: "Chest burning.", safety: "Avoid spicy/fried food.", med: "Antacid", doc: "Physician" },
+        "Constipation (કબજિયાત)": { desc: "Hard stools.", safety: "Eat green vegetables & fruits.", med: "Isabgol", doc: "Physician" },
+        "Food Poisoning (ફૂડ પોઈઝનિંગ)": { desc: "Vomiting after stale food.", safety: "Rest and hydration.", med: "ORS", doc: "Physician" },
+        "Stomach Worms (પેટમાં કૃમિ)": { desc: "Itching and stomach pain.", safety: "Cut nails, wash hands.", med: "Albendazole", doc: "Physician" },
+        "Jaundice (કમળો)": { desc: "Yellow eyes and skin.", safety: "Zero oil diet. Complete rest.", med: "Liver tonic", doc: "Gastro Specialist" },
+        "Piles (હરસ-મસા)": { desc: "Pain/blood during stools.", safety: "Drink more water.", med: "Ointment", doc: "Surgeon" },
+        "Kidney Stone (પથરી)": { desc: "Severe side pain.", safety: "Drink 4-5 liters of water.", med: "Painkillers", doc: "Urologist" },
+        "Vomiting (ઉલટી)": { desc: "Nausea and throwing up.", safety: "Sip water slowly.", med: "Ondansetron", doc: "Physician" },
+        "Hernia (હર્નિયા)": { desc: "Lump in groin or stomach.", safety: "Avoid lifting heavy weights.", med: "Surgery required", doc: "Surgeon" },
+
+        // --- 31-40: LIFESTYLE & CHRONIC ---
+        "Diabetes (ડાયાબિટીસ)": { desc: "High blood sugar.", safety: "Daily walking. No sugar.", med: "Metformin / Insulin", doc: "Physician" },
+        "Blood Pressure (બીપી)": { desc: "High pressure in veins.", safety: "Reduce salt intake.", med: "BP Medicine", doc: "Cardiologist" },
+        "Asthma (દમ)": { desc: "Shortness of breath.", safety: "Avoid dust and smoke.", med: "Inhaler", doc: "Chest Specialist" },
+        "Joint Pain (સાંધાનો દુખાવો)": { desc: "Pain in knees or back.", safety: "Light exercise, warm bag.", med: "Calcium / Pain gel", doc: "Orthopedic" },
+        "Anemia (લોહીની ઉણપ)": { desc: "Weakness, pale skin.", safety: "Eat spinach, beetroot, jaggery.", med: "Iron Tablets", doc: "Physician" },
+        "Thyroid (થાઈરોઈડ)": { desc: "Weight change, tiredness.", safety: "Regular blood test.", med: "Thyroxine", doc: "Endocrinologist" },
+        "Migraine (માઈગ્રેન)": { desc: "One-sided headache.", safety: "Rest in dark, quiet room.", med: "Painkillers", doc: "Neurologist" },
+        "Paralysis (લકવો)": { desc: "Sudden loss of movement.", safety: "Check BP immediately.", med: "Physiotherapy", doc: "🚨 Neurologist" },
+        "Skin Allergy (ખંજવાળ)": { desc: "Redness and itching.", safety: "Use Neem water for bath.", med: "Antihistamine", doc: "Dermatologist" },
+        "Chest Pain (છાતીમાં દુખાવો)": { desc: "Pressure in chest.", safety: "🚨 Sit down. Don't panic.", med: "Sorbitrate / Aspirin", doc: "🚨 EMERGENCY" },
+
+        // --- 41-50: WOMEN & CHILD CARE ---
+        "Pregnancy Nausea": { desc: "Morning sickness.", safety: "Small, frequent meals.", med: "Vitamin B6", doc: "Gynecologist" },
+        "White Discharge": { desc: "Leucorrhea.", safety: "Maintain hygiene.", med: "Antifungals", doc: "Gynecologist" },
+        "Childhood Fever": { desc: "High temp in kids.", safety: "Sponge child with normal water.", med: "Child Paracetamol", doc: "Pediatrician" },
+        "Measles (ઓરી)": { desc: "Red spots on body.", safety: "Isolation, keep eyes clean.", med: "Vitamin A", doc: "Pediatrician" },
+        "Mumps (ગાલપચોળિયાં)": { desc: "Swelling on cheeks.", safety: "Warm compress.", med: "Painkillers", doc: "Pediatrician" },
+        "Anxiety (ગભરામણ)": { desc: "Racing heart, fear.", safety: "Deep breathing (5 mins).", med: "Calmness", doc: "Psychiatrist" },
+        "Insomnia (ઊંઘ ન આવવી)": { desc: "Difficulty sleeping.", safety: "No phone before bed.", med: "Melatonin", doc: "Physician" },
+        "Mouth Ulcers (ચાંદા)": { desc: "Painful spots in mouth.", safety: "Avoid spicy food.", med: "B-Complex", doc: "Dentist" },
+        "Ear Infection": { desc: "Pain and fluid in ear.", safety: "Don't put oil in ear.", med: "Antibiotic drops", doc: "ENT Specialist" },
+        "Toothache": { desc: "Dental pain.", safety: "Apply clove oil.", med: "Painkillers", doc: "Dentist" }
+    };
+
+    const dList = document.getElementById('diseaseList');
+    Object.keys(medicalData).sort().forEach(key => {
+        let opt = document.createElement('option');
+        opt.value = key;
+        dList.appendChild(opt);
+    });
+
+    function generateAnalysis() {
+        const val = document.getElementById('diseaseInput').value;
+        const check = document.getElementById('safetyCheck').checked;
+        if (!val || !medicalData[val]) return alert("Select from list!");
+        if (!check) return alert("Agree to safety!");
+
+        const info = medicalData[val];
+        document.getElementById('outTitle').innerText = val;
+        document.getElementById('outDesc').innerText = info.desc;
+        document.getElementById('outSafety').innerText = info.safety;
+        document.getElementById('outMed').innerText = info.med;
+        document.getElementById('outDoc').innerText = info.doc;
+
+        const docCard = document.getElementById('docCard');
+        docCard.className = info.doc.includes("🚨") ? "card-box emergency" : "card-box";
+
+        document.getElementById('resultArea').style.display = "block";
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RuralCare AI</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Cooper Black", Georgia, serif;
+    color: #1f2937;
+    scroll-behavior: smooth;
+}
+
+/* ===== NAVBAR ===== */
+nav {
+    background: rgba(47,143,70,0.95);
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    font-size: 16px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===== HERO WITH BACKGROUND IMAGE ===== */
+.hero {
+    background:
+      linear-gradient(rgba(234,247,239,0.85), rgba(234,247,239,0.85)),
+      url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3");
+    background-size: cover;
+    background-position: center;
+    padding: 90px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 46px;
+    color: #1f4d2e;
+}
+
+.hero p {
+    max-width: 800px;
+    margin: auto;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.hero-btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 15px 40px;
+    background-color: #14b8a6;
+    color: white;
+    text-decoration: none;
+    border-radius: 40px;
+    font-size: 18px;
+}
+
+.hero-btn:hover {
+    background-color: #0d9488;
+}
+
+/* ===== HOSPITAL LOCATION SECTION (NEW) ===== */
+.location-section {
+    padding: 60px 20px;
+    text-align: center;
+    background: #fdfdfd;
+}
+
+.location-section h2 {
+    color: #1f4d2e;
+    font-size: 32px;
+}
+
+.loc-btn {
+    background-color: #ef4444;
+    color: white;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 40px;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.loc-btn:hover {
+    background-color: #dc2626;
+}
+
+.hospital-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 30px auto;
+    display: none; 
+}
+
+.hosp-card {
+    background: #ffffff;
+    border: 2px solid #eaf7ef;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    position: relative;
+}
+
+.hosp-card:hover { 
+    border-color: #2f8f46; 
+    transform: translateY(-5px); 
+}
+
+.hosp-card h4 { 
+    color: #2f8f46; 
+    margin: 0 0 5px 0; 
+    font-size: 20px; 
+}
+
+.dist-tag {
+    display: inline-block;
+    background: #e1f5fe;
+    color: #0288d1;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.view-map-btn {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 12px;
+    background: #2f8f46;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.view-map-btn:hover { 
+    background: #1e5f2e; 
+}
+
+/* ===== FEATURES ===== */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 60px 40px;
+    background: #eaf7ef;
+}
+
+.card {
+    background: white;
+    padding: 35px;
+    text-align: center;
+    border-radius: 20px;
+    border: 2px solid #d1fae5;
+}
+
+.card h3 {
+    color: #2f8f46;
+}
+
+/* ===== ABOUT PAGE ===== */
+.about {
+    background:
+      linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+      url("https://images.unsplash.com/photo-1576765974257-b414b9ea0051");
+    background-size: cover;
+    background-position: center;
+    padding: 80px 30px;
+    text-align: center;
+}
+
+.about h2 {
+    color: #1f4d2e;
+    font-size: 32px;
+}
+
+.about p {
+    max-width: 850px;
+    margin: auto;
+    font-size: 16px;
+    line-height: 1.9;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    background: #2f8f46;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav>
+    <strong style="color:white;">🌿 RuralCare AI</strong>
+    <div>
+        <a href="#home">Home</a>
+        <a href="#location">Find Hospital</a>
+        <a href="#about">About</a>
+    </div>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+<section class="hero" id="home">
+    <h1>AI-Powered Healthcare for Rural India</h1>
+    <p>
+        Early disease detection, offline diagnosis and voice guidance  
+        for villages and remote areas.  
+        <br><br>
+        (રોગની વહેલી ઓળખ, ઓફલાઇન તપાસ અને અવાજ માર્ગદર્શન — ખાસ ગામડાં માટે)
+    </p>
+
+    <a href="link1.html" class="hero-btn">Start Health Diagnosis</a>
+</section>
+
+<!-- ===== HOSPITAL LOCATION SECTION (NEW) ===== -->
+<section class="location-section" id="location">
+    <h2>📍 Nearby Hospitals & Centers</h2>
+    <p>તમારી આસપાસની હોસ્પિટલ અને તેનું અંતર જોવા માટે નીચે ક્લિક કરો.</p>
+    
+    <button class="loc-btn" onclick="showHospitals()">🔍 Search Hospitals Near Me</button>
+
+    <div id="hospital-list" class="hospital-list">
+        <div class="hosp-card">
+            <span class="dist-tag">📏 1.2 KM Away</span>
+            <h4>🏥 GiriRaj Hospital</h4>
+            <p>📍 Navjyot Park, 150 Feet Ring Rd, Rajkot</p>
+            <p>📞 Emergency: 24/7 Available</p>
+            <a href="#" onclick="openMap('GiriRaj Hospital Rajkot'); return false;" class="view-map-btn">📍 Get Directions (રસ્તો જુઓ)</a>
+        </div>
+
+        <div class="hosp-card">
+            <span class="dist-tag">📏 2.5 KM Away</span>
+            <h4>🏥 Mangalam Hospital</h4>
+            <p>📍 150 Feet Ring Rd, Near Imperial Heights, Rajkot</p>
+            <p>⭐ Multi-speciality Services</p>
+            <a href="#" onclick="openMap('Mangalam Hospital Rajkot'); return false;" class="view-map-btn">📍 Get Directions (રસ્તો જુઓ)</a>
+        </div>
+
+        <div class="hosp-card">
+            <span class="dist-tag">📏 4.0 KM Away</span>
+            <h4>🏥 Civil Hospital</h4>
+            <p>📍 Hospital Chowk, Sadar, Rajkot</p>
+            <p>🏛️ Government Healthcare</p>
+            <a href="#" onclick="openMap('Civil Hospital Rajkot'); return false;" class="view-map-btn">📍 Get Directions (રસ્તો જુઓ)</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+
+<section class="features">
+    <div class="card">
+        <h3>🤖 AI Diagnosis</h3>
+        <a href="link22.html"><p>
+            Early health risk detection even when no doctor is nearby.  
+            <br>(ડોક્ટર નજીક ન હોય ત્યારે પણ આરોગ્ય જોખમની વહેલી ઓળખ)
+        </p></a>
+    </div>
+
+    <div class="card">
+        <h3>📡 Offline Support</h3>
+        <a href="link24.html"><p>
+            Works without internet using locally stored data.  
+            <br>(ઈન્ટરનેટ વગર સ્થાનિક માહિતીથી કાર્ય કરે છે)
+        </p></a>
+    </div>
+
+    <div class="card">
+        <h3>🔊 Voice Guidance</h3>
+        <a href="link25.html"><p>
+            Health advice explained in simple local language.  
+            <br>(સ્થાનિક ભાષામાં સરળ અવાજ માર્ગદર્શન)
+        </p></a>
+    </div>
+
+    <div class="card">
+        <h3>📨 Health Alerts</h3>
+        <a href="link23.html"><p>
+            Quick alerts for health workers and family members.  
+            <br>(આરોગ્ય કર્મચારી અને પરિવારને તાત્કાલિક જાણ)
+        </p></a>
+    </div>
+</section>
+
+<!-- ===== ABOUT PAGE ===== -->
+<section class="about" id="about">
+    <h2>Why RuralCare AI?</h2>
+    <p>
+        RuralCare AI helps underserved regions by providing  
+        AI-based diagnosis, symptom analysis, and medical guidance  
+        even where doctors and hospitals are limited.
+        <br><br>
+        AI analyzes patient symptoms, reports and medical images  
+        like X-rays and scans to give fast and accurate results.
+        <br><br>
+        <strong>Key Features:</strong><br>
+        ✔ AI-powered disease detection<br>
+        ✔ Works on low-cost devices<br>
+        ✔ Supports rural & remote healthcare<br>
+        ✔ Easy to use and fast results
+    </p>
+</section>
+<br>Research Member
+</p>
+<p>
+📧 example@gmail.com<br>
+📞 +91 XXXXXXXX
+</p>
+</div>
+<footer>
+© 2026 RuralCare AI | Hackathon Project  
+<br>(ગ્રામ્ય લોકો માટે બનાવેલ પ્રોજેક્ટ)
+</footer>
+
+<script>
+    function showHospitals() {
+        const list = document.getElementById('hospital-list');
+        list.style.display = 'grid';
+        list.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openMap(destination) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                // આ લિંક કરન્ટ લોકેશનથી હોસ્પિટલ સુધીનો ડાયરેક્ટ રસ્તો બતાવશે
+                const mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+                window.open(mapUrl, '_blank');
+            }, (error) => {
+                // જો યુઝર લોકેશન ના આપે તો ખાલી ડેસ્ટિનેશન બતાવશે
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+                window.open(mapUrl, '_blank');
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

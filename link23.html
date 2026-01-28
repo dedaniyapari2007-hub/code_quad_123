@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Medicine Reminder</title>
+    <style>
+        :root {
+            --bg-color: #0b0f1a;
+            --card-bg: #161b2b;
+            --primary-green: #00ff88;
+            --alert-red: #ff4d4d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+            width: 95%;
+            max-width: 450px;
+            border: 1px solid #2d364d;
+            text-align: center;
+        }
+
+        h2 { color: var(--primary-green); margin-bottom: 5px; }
+        #date-display { color: #8e99af; font-size: 1rem; margin-bottom: 10px; }
+
+        .clock-box {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            font-family: 'Courier New', monospace;
+        }
+
+        .med-item {
+            background: #1e2538;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+        }
+
+        .completed {
+            border-color: var(--primary-green) !important;
+            background: rgba(0, 255, 136, 0.1) !important;
+        }
+
+        .time-info { text-align: left; flex-grow: 1; }
+        .time-label { font-size: 1.1rem; font-weight: bold; display: block; }
+        
+        input[type="time"] {
+            background: #0b0f1a;
+            color: var(--primary-green);
+            border: 1px solid #3d475f;
+            padding: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .check-mark {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #3d475f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: transparent;
+            margin-left: 10px;
+        }
+
+        .completed .check-mark {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--primary-green);
+        }
+
+        /* Modal / Notification */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: #1c2237;
+            padding: 35px;
+            border-radius: 25px;
+            text-align: center;
+            border: 2px solid var(--primary-green);
+            box-shadow: 0 0 40px var(--primary-green);
+            width: 80%;
+        }
+
+        .ok-btn {
+            background: var(--primary-green);
+            color: #000;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .alert-msg {
+            color: var(--alert-red);
+            font-weight: bold;
+            display: none;
+            margin-top: 15px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <h1 style="margin:0;">🔔</h1>
+        <h3 id="modal-title" style="color:var(--primary-green)">દવા લેવાનો સમય!</h3>
+        <p id="modal-desc">કૃપા કરીને તમારી દવા લઈ લો.</p>
+        <button class="ok-btn" onclick="patientClickedOk()">OK</button>
+        <div id="danger-alert" class="alert-msg">⚠️ ચેતવણી: ૨ મિનિટ થઈ ગઈ છે!</div>
+    </div>
+</div>
+
+<div class="container">
+    <h2>🩺 Live Medicine Reminder</h2>
+    <div id="date-display">-- / -- / ----</div>
+    <div class="clock-box" id="main-clock">00:00:00</div>
+
+    <div class="med-list">
+        <div class="med-item" id="box-morning">
+            <div class="time-info">
+                <span class="time-label">સવારની દવા</span>
+                <input type="time" id="time-morning" value="10:36">
+            </div>
+            <div class="check-mark">✓</div>
+        </div>
+
+        <div class="med-item" id="box-afternoon">
+            <div class="time-info">
+                <span class="time-label">બપોરની દવા</span>
+                <input type="time" id="time-afternoon" value="13:30">
+            </div>
+            <div class="check-mark">✓</div>
+        </div>
+
+        <div class="med-item" id="box-night">
+            <div class="time-info">
+                <span class="time-label">રાતની દવા</span>
+                <input type="time" id="time-night" value="21:00">
+            </div>
+            <div class="check-mark">✓</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeMedId = null;
+    let voiceLoop = null;
+    let alertTimer = null;
+
+    function startClock() {
+        const now = new Date();
+        
+        // Date & Clock update
+        document.getElementById('date-display').innerText = now.toLocaleDateString('gu-IN', { day:'numeric', month:'long', year:'numeric' });
+        const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+        document.getElementById('main-clock').innerText = timeStr;
+
+        const currentHM = timeStr.substring(0, 5); // Format "HH:MM"
+
+        // Check each input
+        const ids = ['morning', 'afternoon', 'night'];
+        ids.forEach(id => {
+            const userTime = document.getElementById(`time-${id}`).value;
+            const box = document.getElementById(`box-${id}`);
+
+            if (currentHM === userTime && !activeMedId && !box.classList.contains('completed')) {
+                triggerAlarm(id);
+            }
+        });
+    }
+
+    function triggerAlarm(id) {
+        activeMedId = id;
+        const label = document.querySelector(`#box-${id} .time-label`).innerText;
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('modal-desc').innerText = `તમારી ${label} લેવાનો સમય થઈ ગયો છે.`;
+
+        speak(label);
+        voiceLoop = setInterval(() => speak(label), 6000);
+
+        alertTimer = setTimeout(() => {
+            document.getElementById('danger-alert').style.display = 'block';
+        }, 120000); 
+    }
+
+    function speak(label) {
+        let msg = new SpeechSynthesisUtterance(`${label} લેવાનો સમય થઈ ગયો છે. દવા લઈ લો.`);
+        msg.lang = 'gu-IN';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function patientClickedOk() {
+        if (!activeMedId) return;
+
+        clearInterval(voiceLoop);
+        clearTimeout(alertTimer);
+        window.speechSynthesis.cancel();
+
+        document.getElementById(`box-${activeMedId}`).classList.add('completed');
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('danger-alert').style.display = 'none';
+
+        activeMedId = null;
+    }
+
+    setInterval(startClock, 1000);
+</script>
+
+</body>
+</html>
